@@ -1,3 +1,9 @@
 
 data/raw/*
-data/dataset/*
+
+data/dataset/Governos.csv
+data/dataset/AreasAtuacao_OSC.csv
+data/dataset/AreasAtuacao.csv
+data/dataset/OSC.csv
+data/dataset/SubAreasAtuacao.csv
+data/dataset/SubAreasAtuacao_OSC.csv

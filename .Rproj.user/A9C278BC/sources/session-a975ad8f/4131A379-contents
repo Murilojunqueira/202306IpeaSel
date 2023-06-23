@@ -92,131 +92,225 @@ Na região sudoeste do mapa existe uma série de tabelas de caracterização das
 <br><br>
 
 * Tabela **OSC_Certificados:**
-  * **id_osc:** (chave-primária) identificação da OSC.
+  * **id_osc:** (chave-primária, chave-extrangeira) identificação da OSC.
   * **Certificado_Id:** (chave-primária) indentificação do certificado.
   * **Governo_Id:** (chave-estrangeira) governo que atribuiu o certificado.
   * **dt_inicio_certificado:** (chave-primária) data de início do certificado.
   * **dt_fim_certificado:** data de fim do certificado
 <br><br>
 
-Ainda na região sudoeste do DER...
+Ainda na região sudoeste do DER, existem informações sobre as áreas e subáreas de atuação das OSC. A relação lógica estipulada no modelo de dados é que cada subárea possui uma única área correspondente. As OSC podem ter qualquer número de área ou subáreas em uma relação "de muitos para muitos" (m:n).
 
 * Tabela **AreasAtuacao:**
-  * **Area_Id:**
-  * **Area_Nome:** 
+  * **Area_Id:** (chave-primária) identificação da área de atuação.
+  * **Area_Nome:** Nome da área de atuação.
 <br><br>
 
 * Tabela **AreasAtuacao_OSC:**
-  * **Area_Id:** 
-  * **id_osc:** 
+  * **Area_Id:** (chave-primária, chave-extrangeira) identificação da subárea de atuação.
+  * **id_osc:** (chave-primária, chave-extrangeira) identificação da OSC.
 <br><br>
 
 * Tabela **SubAreasAtuacao:**
-  * **SubArea_Id:** 
-  * **SubArea_Nome:** 
-  * **Area_Id:** 
+  * **SubArea_Id:** (chave-primária) identificação da subárea de atuação.
+  * **SubArea_Nome:** nome da subárea.
+  * **Area_Id:** (chave-estrangeira) nome da área de atuação.
 <br><br>
 
 * Tabela **SubAreasAtuacao_OSC:**
-  * **SubArea_Id:** 
-  * **id_osc:** 
+  * **SubArea_Id:** (chave-primária, chave-extrangeira) identificação da subárea de atuação.
+  * **id_osc:** (chave-primária, chave-extrangeira) identificação da OSC.
 <br><br>
 
+Na região nordeste do DER temos algumas informações sobre a atuação das OSC, como participação em conselhos e conferências (no [Mapa das (OSC)](https://mapaosc.ipea.gov.br/base-dados) essas duas informações estavam juntas, mas o mais correto seria separar elas em tabelas distintas), projetos desenvolvidos e arrecadação de recursos. As tabelas *OSC_Conferencias* e *OSC_Conselhos* fazem a correspondências entre cada OSC e as conferências e os conselhos, respectivamente.
 
 * Tabela **Conferencias:**
-  * **Conferencia_Id:** 
-  * **Conferencia_Nome:** 
-  * **Conferencia_DtInicio:** 
-  * **Conferencia_DtFim:** 
+  * **Conferencia_Id:** (chave-primária) identificação da conferência.
+  * **Conferencia_Nome:** nome da conferência.
+  * **Conferencia_DtInicio:** data de início da conferência.
+  * **Conferencia_DtFim:** data de fim da conferência.
 <br><br>
 
 * Tabela **OSC_Conferencias:**
-  * **id_osc:** 
-  * **Conferencia_Id:** 
-  * **OSCConf_TipoParticipacao:** 
+  * **id_osc:** (chave-primária, chave-estrangeira) identificação da OSC.
+  * **Conferencia_Id:** (chave-primária, chave-estrangeira) identificação da conferência.
+  * **OSCConf_TipoParticipacao:** tipo de participação que a OSC teve na conferência.
 <br><br>
 
 * Tabela **Conselhos:**
-  * **Conselho_Id:** 
-  * **tx_nome_conselho:** 
-  * **tx_nome_orgao_vinculado:** 
-  * **tx_nome_periodicidade_reuniao_conselho:** 
+  * **Conselho_Id:** (chave-primária) identificação do conselho.
+  * **tx_nome_conselho:** nome do conselho.
+  * **tx_nome_orgao_vinculado:** nome do órgão governamental no qual o conselho é vinculado.
+  * **tx_nome_periodicidade_reuniao_conselho:** periodicidade da reunião do conselho.
 <br><br>
 
 * Tabela **OSC_Conselhos:**
-  * **id_osc:** 
-  * **Conselho_Id:** 
-  * **dt_data_inicio_conselho:** 
-  * **dt_data_fim_conselho:** 
+  * **id_osc:** (chave-primária, chave-estrangeira) identificação da OSC.
+  * **Conselho_Id:** (chave-primária, chave-estrangeira)  identificação do conselho.
+  * **dt_data_inicio_conselho:** data de início da participação da OSC no conselho.
+  * **dt_data_fim_conselho:** data de fim da participação da OSC no conselho.
 <br><br>
 
+A longa tabela dos "projeto" indica que muitas variáveis que estão nesta única tabela possuem relações de "um para muitos" (1:m) ou "muitos para muitos" (m:n). Certemente após uma análise mais detida das características dos dados ela seria quebrada em várias tabelas.
+
 * Tabela **Projetos:**
-  * **id_projeto:** 
-  * **id_osc:** 
-  * **tx_nome_projeto:** 
-  * **dt_data_inicio_projeto:** 
-  * **dt_data_fim_projeto:** 
-  * **tx_link_projeto:** 
-  * **nr_total_beneficiarios:** 
-  * **nr_valor_captado_projeto:** 
-  * **nr_valor_total_projeto:** 
-  * **tx_nome_abrangencia_projeto:** 
-  * **tx_nome_zona_atuacao:** 
-  * **tx_descricao_projeto:** 
-  * **tx_metodologia_monitoramento:** 
-  * **tx_status_projeto_outro:** 
-  * **tx_nome_financiador:** 
-  * **tx_orgao_concedente:** 
-  * **tx_nome_origem_fonte_recursos_projeto:** 
-  * **tx_nome_fonte_recursos_projeto:** 
-  * **tx_nome_regiao_localizacao_projeto:** 
-  * **tx_nome_objetivo_projeto:** 
-  * **tx_nome_meta_projeto:** 
-  * **tx_nome_publico_beneficiado:** 
-  * **nr_estimativa_pessoas_atendidas:** 
-  * **tx_nome_tipo_parceria:** 
+  * **id_projeto:** (chave-primária) identificação dos projetos.
+  * **id_osc:** (chave-estrangeira) identificação da OSC.
+  * **tx_nome_projeto:** nome do projeto.
+  * **dt_data_inicio_projeto:** data de início do projeto.
+  * **dt_data_fim_projeto:** data de fim do projeto.
+  * **tx_link_projeto:** link para a página do convênio no portal 'https://www.convenios.gov.br'.
+  * **nr_total_beneficiarios:** número total de beneficiários do convêncio.
+  * **nr_valor_captado_projeto:** valor captado para o projeto.
+  * **nr_valor_total_projeto:** valor total do projeto.
+  * **tx_nome_abrangencia_projeto:** abrangência do projeto.
+  * **tx_nome_zona_atuacao:** nome da zona de atuação do projeto.
+  * **tx_descricao_projeto:** descrição do projeto.
+  * **tx_metodologia_monitoramento:** metodologia de monitoramento do projeto.
+  * **ft_identificador_projeto_externo:** identificador do projeto no órgão externo.
+  * **tx_status_projeto_outro:** status do projeto.
+  * **tx_nome_financiador:** nome do financiador do projeto.
+  * **tx_orgao_concedente:** nome do órgão concedente do projeto.
+  * **tx_nome_origem_fonte_recursos_projeto:** nome da origem dos recursos do projeto.
+  * **tx_nome_fonte_recursos_projeto:** nome da fonte dos recursos do projeto.
+  * **tx_nome_regiao_localizacao_projeto:** região de localização do projeto.
+  * **tx_nome_objetivo_projeto:** objetivo do projeto.
+  * **tx_nome_meta_projeto:** meta do projeto.
+  * **tx_nome_publico_beneficiado:** nome dos beneficiados do projeto.
+  * **nr_estimativa_pessoas_atendidas:** estimativa de pessoas atendidas pelo projeto.
+  * **tx_nome_tipo_parceria:** nome do tipo de parceria estabelecida para o projeto.
 <br><br>
 
 * Tabela **Recursos:**
-  * **Recurso_Id:** 
-  * **id_osc:** 
-  * **tx_nome_fonte_recursos_osc:** 
-  * **dt_ano_recursos_osc:** 
-  * **nr_valor_recursos_osc:** 
-  * **ft_fonte_recursos_osc:** 
+  * **Recurso_Id:** (chave-primária) identificação dos recursos.
+  * **id_osc:** (chave-estrangeira) identificação da OSC.
+  * **tx_nome_fonte_recursos_osc:** nome da fonte dos recursos.
+  * **dt_ano_recursos_osc:** ano em que os recursos foram arrecadados.
+  * **nr_valor_recursos_osc:** valor dos recursos.
+  * **ft_fonte_recursos_osc:** nome do órgão que concedeu os recursos.
 <br><br>  
 
+Por fim, na região sudeste do DER, existe algumas tabelas sobre as "pessoas". Elas são informações sobre a diretoria e os diretores da OSC e também sobre o número de pessoas empregadas, segundo a RAIS (Relação Anual de Informações Sociais), vinculada ao Ministério do Trabalho.
 
 * Tabela **Diretoria:**
-  * **Diretoria_Id:** 
-  * **id_osc:** 
-  * **ano:** 
-  * **nm_diretor:** 
-  * **nm_cargo:** 
-  * **in_empregado_publico:** 
+  * **Diretoria_Id:** (chave-primária) identificação da diretoria.
+  * **id_osc:** (chave-estrangeira) identificação da OSC. 
+  * **ano:** Ano do relatório de prestação de contas.
+  * **nm_diretor:** nome do diretor .
+  * **nm_cargo:** Cargo do diretor.
+  * **in_empregado_publico:** Indicador de que o diretor é funcionário público.
 <br><br>
 
 * Tabela **Diretores:**
-  * **Diretor_Id:** 
-  * **url_principal:** 
-  * **tp_sede:** 
-  * **nm_cartorio:** 
-  * **dt_reg:** 
-  * **in_mudanca_previa:** 
-  * **dt_inicio_mandato_atual:** 
-  * **dt_fim_mandato_atual:** 
-  * **nm_diretor:** 
-  * **nm_ocupacao:** 
-  * **nm_genero:** 
-  * **in_empregado_publico:** 
-  * **in_funcao_remunerada:** 
-  * **nm_funcao_remunerada:** 
+  * **Diretor_Id:** (chave-primária) identidicação dos diretores.
+  * **id_osc:** (chave-estrangeira) identificação da OSC.
+  * **url_principal:** URL do relatório circunstanciado.
+  * **tp_sede:** Tipo de sede da entidade (Alugada; Cedida; Comodato; Outros;Propria).
+  * **nm_cartorio:** Nome do cartório do registro legal da entidade.
+  * **dt_reg:** Data do registro da entidade.
+  * **in_mudanca_previa:** Indicador de mudança na diretoria no exercício anterior.
+  * **dt_inicio_mandato_atual:** Data de início do mandato atual.
+  * **dt_fim_mandato_atual:** Data de término do mandato atual.
+  * **nm_diretor:** Nome do diretor.
+  * **nm_ocupacao:** Nome do cargo do diretor.
+  * **nm_genero:** Nome do gênero do diretor.
+  * **in_empregado_publico:** Indicador de que o diretor é funcionário público.
+  * **in_funcao_remunerada:** Indicador de que o diretor exerce função remunerada na entidade.
+  * **nm_funcao_remunerada:** Nome da função remunerada exercida na entidade.
 <br><br>
 
 * Tabela **VinculosEmpregaticiosAno:**
-  * **id_osc:** 
-  * **Ano:** 
+  * **id_osc:** (chave-primária, chave-extrangeira) identificação da OSC.
+  * **Ano:** (chave-primária) 
   * **n_vinc_ativos:** 
   * **n_vinc_defic:** 
   
 
+### Formatação dos dados originais no novo *schema*
+
+Finalizado a definição do modelo de dados, vamos pegar as [bases originais](https://mapaosc.ipea.gov.br/base-dados) e colocar no novo formato usando o R. Abaixo está um pequeno exemplo de como isso seria feito. Fizemos a formatação dos dados das OSC, dos Governos (as bases das UFs e dos Município já estavam previamente inseridas nos nossos dados, através de dados baixados do IBGE), das áreas e subáreas de atuação das OSC. A nossa proposta é continuar esse trabalho com todos os dados do Mapa das OSC.
+
+o script R descrito abaixo é o arquivo ['src/FormataBD.R'](src/FormataBD.R) deste repositório.
+
+Primeiramente, vamos carregar alguns pacotes básicos de sobrevivência:
+
+```{r eval = FALSE}
+# Main packages
+library(tidyverse)
+library(data.table)
+library(stringr)
+library(assertthat)
+
+
+# Options
+options(stringsAsFactors = FALSE)
+options(encoding = "utf-8")
+options(dplyr.summarise.inform = FALSE)
+```
+
+Agora iremos criar a tabela **Governos**. Faremos isso empilhando as chaves primárias dos municípios e dos Estados e atribuindo corretamente a variável *Governo_Tipo*:
+
+```{r eval = FALSE}
+# Formata Tabela 'Governos' ####
+
+# Carrega Dados prévios sobre os estados:
+Ufs <- fread("data/dataset/UFs.csv", encoding = "Latin-1")
+
+# Carrega dados prévios sobre os municípios:
+Municipios <- fread("data/dataset/Municipios.csv", encoding = "Latin-1")
+
+# Empilha chaves-primárias de estados e municípios, adiciona a variável Governo_Tipo
+Governos_Id <- Ufs %>% 
+  rename(Governo_Id = UF_Id) %>% 
+  bind_rows(select(
+    rename(
+      Municipios, 
+      Governo_Id = Munic_Id), 
+    Governo_Id)) %>% 
+  select(Governo_Id) %>% 
+  mutate(Governo_Tipo = ifelse(nchar(Governo_Id) == 2, "Estado", "Municipio"))
+  
+# Salva os dados em csv
+fwrite(Governos_Id, "data/dataset/Governos.csv",
+       sep = ";", dec = ",")
+
+# Limpa a memória
+rm(Ufs, Municipios, Governos_Id)
+```
+
+Agora iremos criar a tabela **OSC**, usando a tabela *area_subarea.xlsx*, disponível nas bases de dados do Mapa das OSC. A lista das **OSC** aparece várias vezes no banco e futuramente seria interessante fazer uma checagem para ver se os dados estão consistentes.
+
+
+```{r eval = FALSE}
+# Carrega o pacote 'readxl', para ler dados em MS Excel.
+library(readxl)
+
+# Carrega dados do Excel
+area_subarea <- read_xlsx("data/raw/area_subarea.xlsx", 
+                          sheet = "area_subarea")
+
+OSC <- area_subarea %>% 
+  # Seleciona apenas variáveis relevantes.
+  select(1, cd_identificador_osc, tx_razao_social_osc, tx_nome_fantasia_osc,
+         dt_fundacao_osc, cd_natureza_juridica_osc, edmu_cd_municipio) %>% 
+  # Renomeia a variável do código municipal:
+  rename(Munic_Id = edmu_cd_municipio)
+
+# Salva os dados em csv
+fwrite(OSC, "data/dataset/OSC.csv", sep = ";", dec = ",")
+
+# Limpa a memória
+rm(OSC)
+```
+
+
+
+
+```{r eval = FALSE}
+
+```
+
+
+```{r eval = FALSE}
+
+```

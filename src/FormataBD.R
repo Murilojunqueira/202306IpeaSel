@@ -4,13 +4,28 @@
 
 # Created at 2023-06-13
 
+# Pacotes básicos de sobrevivência:
+library(tidyverse)
+library(data.table)
+library(stringr)
+library(assertthat)
+
+
+# Options
+options(stringsAsFactors = FALSE)
+options(encoding = "utf-8")
+options(dplyr.summarise.inform = FALSE)
+
 
 # Formata Tabela 'Governos' ####
 
+# Carrega Dados prévios sobre os estados:
 Ufs <- fread("data/dataset/UFs.csv", encoding = "Latin-1")
 
+# Carrega dados prévios sobre os municípios:
 Municipios <- fread("data/dataset/Municipios.csv", encoding = "Latin-1")
 
+# Empilha chaves-primárias de estados e municípios, adiciona a variável Governo_Tipo
 Governos_Id <- Ufs %>% 
   rename(Governo_Id = UF_Id) %>% 
   bind_rows(select(
@@ -21,25 +36,25 @@ Governos_Id <- Ufs %>%
   select(Governo_Id) %>% 
   mutate(Governo_Tipo = ifelse(nchar(Governo_Id) == 2, "Estado", "Municipio"))
   
-
+# Salva os dados em csv
 fwrite(Governos_Id, "data/dataset/Governos.csv",
        sep = ";", dec = ",")
-  
+
+# Limpa a memória
 rm(Ufs, Municipios, Governos_Id)
 
 # Cria tabela OSC ####
 
 
 # Utilizando a tabela "area_subarea.xlsx":
-
+# Carrega o pacote 'readxl', para ler dados em MS Excel.
 library(readxl)
 
+# Carrega dados do Excel
 area_subarea <- read_xlsx("data/raw/area_subarea.xlsx", 
                           sheet = "area_subarea")
 
-area_subarea <- fread("data/raw/area_subarea.csv")
-
-
+# Seleciona apenas variáveis relevantes.
 OSC <- area_subarea %>% 
   select(1, cd_identificador_osc, tx_razao_social_osc, tx_nome_fantasia_osc,
          dt_fundacao_osc, cd_natureza_juridica_osc)
