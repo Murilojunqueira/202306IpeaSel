@@ -278,7 +278,7 @@ fwrite(Governos_Id, "data/dataset/Governos.csv",
 rm(Ufs, Municipios, Governos_Id)
 ```
 
-Agora iremos criar a tabela **OSC**, usando a tabela *area_subarea.xlsx*, disponível nas bases de dados do Mapa das OSC. A lista das **OSC** aparece várias vezes no banco e futuramente seria interessante fazer uma checagem para ver se os dados estão consistentes.
+Agora iremos criar a tabela **OSC**, usando a tabela *area_subarea.xlsx* (ele precisa ser baixado da [base de dados do Mapa das (OSC)](https://mapaosc.ipea.gov.br/base-dados)), disponível nas bases de dados do Mapa das OSC. A lista das **OSC** aparece várias vezes no banco e futuramente seria interessante fazer uma checagem para ver se os dados estão consistentes.
 
 
 ```{r eval = FALSE}
@@ -289,6 +289,7 @@ library(readxl)
 area_subarea <- read_xlsx("data/raw/area_subarea.xlsx", 
                           sheet = "area_subarea")
 
+# Cria a tabela OSC
 OSC <- area_subarea %>% 
   # Seleciona apenas variáveis relevantes.
   select(1, cd_identificador_osc, tx_razao_social_osc, tx_nome_fantasia_osc,
@@ -304,13 +305,128 @@ rm(OSC)
 ```
 
 
+Seguindo com nosso exemplo, iremos formatar o conjunto de tabelas que especificam as áreas e subáreas do de atuação das OSC. Faremos isso com o arquivo "area_subarea.xlsx" 
 
 
 ```{r eval = FALSE}
+# Carrega dados do Excel
+area_subarea <- read_xlsx("data/raw/area_subarea.xlsx", 
+                          sheet = "area_subarea")
 
+# As áreas de atuação são os nomes das colunas 13 a 23 do banco 'area_subarea'.
+AreasAtuacao <- names(area_subarea)[13:23] %>% 
+  enframe(name = NULL, value = "Area_Nome") %>% 
+  mutate(Area_Id = row_number())
+
+# As subáreas de atuação são os nomes das colunas 24 a 68 do banco 'area_subarea'.
+SubAreasAtuacao <- names(area_subarea)[25:68] %>% 
+  enframe(name = NULL, value = "SubArea_Nome") %>% 
+  mutate(Area_Id = NA,
+         SubArea_Id = row_number()) %>% 
+  select(SubArea_Id, Area_Id, SubArea_Nome)
+  
+# Fazendo a relação entre áreas e sub-áreas:
+SubAreasAtuacao$Area_Id[25:26 - 24] <- 1 # Habitação
+SubAreasAtuacao$Area_Id[27:29 - 24] <- 2 # Saúde
+SubAreasAtuacao$Area_Id[30:32 - 24] <- 3 # Cultura e recreação
+SubAreasAtuacao$Area_Id[33:41 - 24] <- 4 # Educação e pesquisa
+SubAreasAtuacao$Area_Id[42:43 - 24] <- 5 # Assistência social
+SubAreasAtuacao$Area_Id[44:45 - 24] <- 6 # Religião
+SubAreasAtuacao$Area_Id[46:50 - 24] <- 7 # 	Associações patronais, profissionais e de produtores rurais
+SubAreasAtuacao$Area_Id[51:53 - 24] <- 8 # Meio ambiente e proteção animal
+SubAreasAtuacao$Area_Id[54:67 - 24] <- 9 # Desenvolvimento e defesa de direitos
+SubAreasAtuacao$Area_Id[68 - 24] <- 10 # Outros
 ```
 
+Agora iremos criar um loop para, para cada área, encontrar as OSC que atuam naquela área.
 
 ```{r eval = FALSE}
+# O primeiro passo é criar um banco de dados em branco com as variáveis
+# utilizadas:
+AreasAtuacao_OSC <- tibble(Area_id = integer(0), id_osc = integer(0))
+
+# Agora, para cada área, iremos rodar um loop.
+for (i in seq_len(nrow(AreasAtuacao))) {
+  
+  # Uma mensagem para sabermos o que está acontecendo
+  message("Inserindo OSC da área: ", AreasAtuacao$Area_Nome[i])
+  
+  # Encontramos o nome da área que estamos busando.
+  Area_i <- which(names(area_subarea) == AreasAtuacao$Area_Nome[i])
+  
+  # Seleciona apenas as OSC que atuam naquela áreas.
+  OSC_Area <- area_subarea %>% 
+    select(1, Area_i) %>% 
+    na.omit() %>% 
+    magrittr::set_names(c("id_osc", "Area_id")) %>% 
+    mutate(Area_id = AreasAtuacao$Area_Id[i])
+  
+  # Adiciona a relação entre área e OSC no banco:
+  AreasAtuacao_OSC <- bind_rows(AreasAtuacao_OSC, OSC_Area)
+  
+  # Limpa a memória
+  rm(Area_i, OSC_Area)
+}
+rm(i)
+```
+
+Agora já podemos salvar as tabelas com a lista das áreas de atuação e a relação entre áreas e OSC:
+
+```{r eval = FALSE}
+# Salva os dados em csv
+fwrite(AreasAtuacao_OSC, "data/dataset/AreasAtuacao_OSC.csv", 
+       sep = ";", dec = ",")
+
+fwrite(AreasAtuacao, "data/dataset/AreasAtuacao.csv", 
+       sep = ";", dec = ",")
+```
+
+Para salvar as informações a respeito das subáreas, basicamente, repetimo o processo das áreas de atuação
+
+```{r eval = FALSE}
+# criamos um banco de dados em branco:
+SubAreasAtuacao_OSC <- tibble(id_osc = integer(0), 
+                              SubArea_id = integer(0),
+                              Area_Id = integer(0))
+
+# Loop para cada subárea>
+for (i in seq_len(nrow(SubAreasAtuacao))) {
+  
+  # Mensagem
+  message("Inserindo OSC da Subárea: ", SubAreasAtuacao$SubArea_Nome[i])
+  
+  # Nome da subárea
+  SubArea_Nome <- SubAreasAtuacao$SubArea_Nome[i]
+  
+  # Seleciona as OSC que atuam naquela subárea.
+  OSC_SubArea <- area_subarea  %>% 
+    select(1, all_of(SubArea_Nome)) %>% 
+    na.omit() %>% 
+    magrittr::set_names(c("id_osc", "SubArea_id"))  %>% 
+    mutate(SubArea_id = SubAreasAtuacao$SubArea_Id[i], 
+           Area_Id = SubAreasAtuacao$Area_Id[i])
+  
+  # Adiciona os dados ao banco
+  SubAreasAtuacao_OSC <- bind_rows(SubAreasAtuacao_OSC, OSC_SubArea)
+  
+  # Limpa a memória
+  rm(SubArea_Nome, OSC_SubArea)
+}
+rm(i)
+
+# salva as bases de dados em csv.
+fwrite(SubAreasAtuacao_OSC, "data/dataset/SubAreasAtuacao_OSC.csv", 
+       sep = ";", dec = ",")
+
+fwrite(SubAreasAtuacao, "data/dataset/SubAreasAtuacao.csv", 
+       sep = ";", dec = ",")
+
+# Limpa a memória
+rm(AreasAtuacao_OSC, AreasAtuacao, SubAreasAtuacao_OSC, SubAreasAtuacao)
+
+# Checa se a memória está limpa
+ls()
 
 ```
+
+A mesma lógica se repete em todas as bases. Quando todas estiverem formatadas, basta migrar os dados para um DBMS (Data Base Management System), como o PostgreSQL ou o MySQL, conforme especificado na seção "Os passos dessa reformulação...", acima.

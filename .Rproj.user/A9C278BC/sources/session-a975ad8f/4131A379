@@ -3,7 +3,7 @@
     "path": "D:/Users/Murilo/Dropbox/ActiveProjects/202306IpeaSel/README.Rmd",
     "project_path": "README.Rmd",
     "type": "r_markdown",
-    "hash": "3440481368",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1687481975944.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "289,49",
-        "scrollLine": "285"
+        "cursorPosition": "291,0",
+        "scrollLine": "284"
     },
     "folds": "",
-    "lastKnownWriteTime": 1687489419,
+    "lastKnownWriteTime": 1687490377,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1687489419788,
+    "last_content_update": 1687490377641,
     "read_only": false,
     "read_only_alternatives": []
 }
